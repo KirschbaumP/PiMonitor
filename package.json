@@ -1,0 +1,20 @@
+{
+  "name": "infoscreen",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./app"
+  },
+  "dependencies": {
+    "dateformat": "^2.0.0",
+    "express": "~4.13.4",
+    "iconv-lite": "^0.4.15",
+    "node-schedule": "*",
+    "request": "*",
+    "socket.io": "*"
+  },
+  "main": "app.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

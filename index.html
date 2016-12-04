@@ -1,0 +1,204 @@
+<html>
+<head>
+    <title>Info-Screen</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        html, body, .bb100 {
+            height: 100%;
+        }
+
+        div {
+            padding: 0;
+            margin: 0;
+        }
+
+        .row {
+            margin-right: 0;
+            margin-left: 0;
+        }
+
+        .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+
+            padding-right: 0;
+            padding-left: 0;
+        }
+
+        .bb10 {
+            height: 10%;
+        }
+
+        .bb20 {
+            height: 20%;
+        }
+
+        .bb30 {
+            height: 30%;
+        }
+
+        .bb40 {
+            height: 40%;
+        }
+
+        .bb50 {
+            height: 50%;
+        }
+
+        .bb60 {
+            height: 60%;
+        }
+
+        .bb70 {
+            height: 70%;
+        }
+
+        .bb80 {
+            height: 80%;
+        }
+
+        .bb90 {
+            height: 90%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .time {
+            font-size: 120px;
+        }
+
+        .timehead {
+            font-size: 30px;
+        }
+
+        .timehead, .time, .boerse {
+            text-align: center;
+        }
+
+        .boerse {
+            font-size: 40px;
+            color: red;
+        }
+
+        .bg1 {
+            background-color: #00B7FF;
+        }
+
+        .bg2 {
+            background-color: #008800;
+        }
+
+        .bg3 {
+            background-color: #fc8c84;
+        }
+
+        .bg4 {
+            background-color: chartreuse;
+        }
+
+        .depatures {
+            padding-left: 10px;
+            padding-right: 10px;
+            font-size: 22px;
+        }
+    </style>
+</head>
+<body>
+<div class="row bb100">
+    <div class="col-md-12 bb50 bg1">
+        <div class="col-md-6 bb10 timehead" id="plastat">Planegg</div>
+        <div class="col-md-6 bb10 timehead" id="grfstat">Gr&auml;felfing</div>
+        <div class="col-md-6 bb90 depatures" id="sbahnPlanegg"></div>
+        <div class="col-md-6 bb90 depatures" id="sbahnGraefelfing"></div>
+    </div>
+    <div class="col-md-12 bb30 bg2">
+        <div class="col-md-6 bb100 bg4">&lt;&lt;ToDo:Wetter&gt;&gt;</div>
+        <div class="col-md-6 bb100 boerse bg1">&lt;&lt;ToDo:B&ouml;rse&gt;&gt;</div>
+    </div>
+    <div class="col-md-12 bb20 bg3">
+        <div class="col-md-6 bb20 timehead bg1">Hier</div>
+        <div class="col-md-6 bb20 timehead bg4">Neuseeland</div>
+        <div class="col-md-6 bb80 time bg1" id="time1"></div>
+        <div class="col-md-6 bb80 time bg4" id="time2"></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    $(function () {
+
+        var socket = io();
+        socket.on('pladepature', function (data) {
+            depature($("#sbahnPlanegg"), $("#plastat"), data, "Planegg");
+        });
+        socket.on('grfdepature', function (data) {
+            depature($("#sbahnGraefelfing"), $("#grfstat"), data, "Gräfelfing");
+        });
+
+        function depature(anzeigetafel, header, data, stattext) {
+            var s = jQuery.parseJSON(data.replace("journeysObj = ", ""));
+
+            var time = new Date();
+
+            anzeigetafel.empty();
+            header.text(stattext + " (" + checkTime(time.getHours()) + ":" + checkTime(time.getMinutes()) + ":" + checkTime(time.getSeconds()) + ")");
+            $.each(s.journey, function (i, item) {
+                var bez = item.pr;
+                while (bez.indexOf(" ") >= 0) {
+                    bez = bez.replace(" ", "");
+                }
+                var dest = item.st.replace("M?", "M&uuml;")
+                        .replace("Stra?e", "Stra&szlig;e")
+                        .replace("F?rstenried", "F&uuml;rstenried")
+                        .replace("Gro?hadern", "Gro&szlig;hadern")
+                        .replace("Gr?felfing", "Gr&auml;felfing");
+
+                var verstpaetung = "p&uuml;nktlich";
+                var istankunft = item.ti;
+                if (item.rt !== false) {
+                    istankunft = item.rt.dlt;
+                    if (item.rt.dlm != "0") {
+                        verstpaetung = item.rt.dlm + " Min Versp&auml;tung";
+                    }
+                }
+
+
+                var class1 = bez === "S6" ? " bg-warning" : "bg-primary";
+                anzeigetafel.append('<div class="col-md-1 ' + class1 + '">' + bez + '</div>' +
+                        '<div class="col-md-6 ' + class1 + '">' + dest + '</div>' +
+                        '<div class="col-md-4 ' + class1 + '">' + verstpaetung + '</div>' +
+                        '<div class="col-md-1 ' + class1 + '">' + istankunft + '</div> ');
+            });
+        }
+
+        Date.prototype.addHours = function (h) {
+            this.setTime(this.getTime() + (h * 60 * 60 * 1000));
+            return this;
+        }
+
+        /* Time */
+        function startTime1() {
+            settime(new Date(), $('#time1'));
+            settime(new Date().addHours(12), $('#time2'));
+            setTimeout(startTime1, 200);
+        }
+
+        function settime(time, element) {
+            element.html(checkTime(time.getHours()) + ":" + checkTime(time.getMinutes()) + ":" + checkTime(time.getSeconds()));
+        }
+
+        function checkTime(i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
+        }
+
+        startTime1();
+    });
+</script>
+</body>
+</html>
