@@ -156,21 +156,23 @@
                         .replace("Gro?hadern", "Gro&szlig;hadern")
                         .replace("Gr?felfing", "Gr&auml;felfing");
 
+                var class1 = bez === "S6" ? " bg-warning" : "bg-primary";
+                var class2 = class1;
                 var verstpaetung = "p&uuml;nktlich";
                 var istankunft = item.ti;
                 if (item.rt !== false) {
                     istankunft = item.rt.dlt;
                     if (item.rt.dlm != "0") {
-                        verstpaetung = item.rt.dlm + " Min Versp&auml;tung";
+                        verstpaetung = item.rt.dlm + " Min";
+                        class2 = "bg-danger";
                     }
                 }
 
 
-                var class1 = bez === "S6" ? " bg-warning" : "bg-primary";
                 anzeigetafel.append('<div class="col-md-1 ' + class1 + '">' + bez + '</div>' +
-                        '<div class="col-md-6 ' + class1 + '">' + dest + '</div>' +
-                        '<div class="col-md-4 ' + class1 + '">' + verstpaetung + '</div>' +
-                        '<div class="col-md-1 ' + class1 + '">' + istankunft + '</div> ');
+                        '<div class="col-md-8 ' + class1 + '">' + dest + '</div>' +
+                        '<div class="col-md-2 ' + class2 + '">' + verstpaetung + '</div>' +
+                        '<div class="col-md-1 ' + class2 + '">' + istankunft + '</div> ');
             });
         }
 
