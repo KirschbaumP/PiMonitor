@@ -22,9 +22,12 @@ var url = ["http://s-bahn-muenchen.hafas.de/bin/540/bhftafel.exe/"+
 
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/style.css', function(req, res){
+    res.sendFile(__dirname + '/style.css');
+});
 
 
 io.on('connection', function(socket){});
