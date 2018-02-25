@@ -9,16 +9,58 @@
 <div class="row bb100">
     <div class="col-md-12 bb50 bg1">
         <div class="col-md-6 bb10 timehead" id="grfstat">Gr&auml;felfing</div>
-        <div class="col-md-6 bb10 timehead" id="plastat">Planegg</div>
+        <div class="col-md-6 bb10 timehead"></div>
         <div class="col-md-6 bb90 depatures" id="sbahnGraefelfing"></div>
-        <div class="col-md-6 bb90 depatures" id="sbahnPlanegg"></div>
+        <div class="col-md-6 bb90 depatures"></div>
     </div>
     <div class="col-md-12 bb30 bg2">
         <div class="col-md-6 bb100 bg4">&lt;&lt;ToDo:Wetter&gt;&gt;</div>
-        <div class="col-md-6 bb100 boerse bg1">&lt;&lt;ToDo:B&ouml;rse&gt;&gt;</div>
+        <div class="col-md-6 bb100 boerse bg1">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Titel</th>
+                    <th>Geld</th>
+                    <th>Brief</th>
+                    <th>Uhrzeit</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr id="br0">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="br1">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="br2">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="br3">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-md-12 bb20 bg3">
-        <div class="col-md-6 bb20 timehead bg1">Hier</div>
+        <div class="col-md-6 bb20 timehead bg1">Uhrzeit</div>
         <div class="col-md-6 bb20 timehead bg4"></div>
         <div class="col-md-6 bb80 time bg1" id="time1"></div>
         <div class="col-md-6 bb80 time bg4" id="time2"></div>
@@ -29,13 +71,17 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     $(function () {
-
         var socket = io();
-        socket.on('pladepature', function (data) {
-            depature($("#sbahnPlanegg"), $("#plastat"), data, "Planegg");
-        });
         socket.on('grfdepature', function (data) {
             depature($("#sbahnGraefelfing"), $("#grfstat"), data, "Gräfelfing");
+        });
+        socket.on('boerse', function (data) {
+            console.log(data);
+            $("#br" + data.id + " td:nth-child(1)").html(data.id);
+            $("#br" + data.id + " td:nth-child(2)").html(data.title);
+            $("#br" + data.id + " td:nth-child(3)").html(data.geld);
+            $("#br" + data.id + " td:nth-child(4)").html(data.brief);
+            $("#br" + data.id + " td:nth-child(5)").html(data.time);
         });
 
         function depature(anzeigetafel, header, data, stattext) {
@@ -51,10 +97,10 @@
                     bez = bez.replace(" ", "");
                 }
                 var dest = item.st.replace("M?", "M&uuml;")
-                        .replace("Stra?e", "Stra&szlig;e")
-                        .replace("F?rstenried", "F&uuml;rstenried")
-                        .replace("Gro?hadern", "Gro&szlig;hadern")
-                        .replace("Gr?felfing", "Gr&auml;felfing");
+                    .replace("Stra?e", "Stra&szlig;e")
+                    .replace("F?rstenried", "F&uuml;rstenried")
+                    .replace("Gro?hadern", "Gro&szlig;hadern")
+                    .replace("Gr?felfing", "Gr&auml;felfing");
 
                 var class1 = bez === "S6" ? " bg-warning" : "bg-primary";
                 var class2 = class1;
@@ -70,9 +116,9 @@
 
 
                 anzeigetafel.append('<div class="col-md-1 ' + class1 + '">' + bez + '</div>' +
-                        '<div class="col-md-8 ' + class1 + '">' + dest + '</div>' +
-                        '<div class="col-md-2 ' + class2 + '">' + verstpaetung + '</div>' +
-                        '<div class="col-md-1 ' + class2 + '">' + istankunft + '</div> ');
+                    '<div class="col-md-8 ' + class1 + '">' + dest + '</div>' +
+                    '<div class="col-md-2 ' + class2 + '">' + verstpaetung + '</div>' +
+                    '<div class="col-md-1 ' + class2 + '">' + istankunft + '</div> ');
             });
         }
 
